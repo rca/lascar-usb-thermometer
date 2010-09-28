@@ -1,0 +1,13 @@
+usb_termometer: program to use Lascar usb thermometer under linux
+=================================================================
+
+usb_termometer is a small program to catch temperature and humidity from 
+EL-USB-RT from vendor lascar ltd (http://www.lascarelectronics.com) 
+
+In order to compile this program you must to have in your system "libhid" 
+installed. 
+
+You can download source code and compile it from: 
+http://libhid.alioth.debian.org/
+
+If you have any ubuntu or debian system, I think you can apt-get this lib
