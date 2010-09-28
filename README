@@ -21,5 +21,7 @@ Installing
 ==========
 -Download libhid from http://libhid.alioth.debian.org/ and compile or apt-get if you
 use debian like systems. You must also have installed libusb-devel.
--Download tar.bz2 of http://code.google.com/p/lascar-usb-termometer/downloads/list and
+-Make a checkout with subversion: 
+svn checkout http://lascar-usb-termometer.googlecode.com/svn/trunk/ lascar-usb-termometer-read-only 
+or download tar.bz2 of http://code.google.com/p/lascar-usb-termometer/downloads/list and
 compile.
