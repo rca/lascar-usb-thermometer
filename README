@@ -25,3 +25,4 @@ use debian like systems. You must also have installed libusb-devel.
 svn checkout http://lascar-usb-termometer.googlecode.com/svn/trunk/ lascar-usb-termometer-read-only 
 or download tar.bz2 of http://code.google.com/p/lascar-usb-termometer/downloads/ and
 compile.
+
