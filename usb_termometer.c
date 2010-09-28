@@ -20,7 +20,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #define EP_HID_IN             0x81
-#define espera		      400
+#define espera		      520
 #define STEPT 0.1
 #define STEPH 0.5
 #define dev_id { 0x1781, 0x0ec4, NULL, NULL, 0 }
