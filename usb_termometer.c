@@ -38,7 +38,6 @@ float get_hum(unsigned char);
 int main(){
 /* vars */
 
-unsigned int ptemperatura;
 char packet[]={0x00,0x00,0x00};
 HIDInterface* hid=NULL;
 hid_return ret;
@@ -60,7 +59,7 @@ ret = read_device(hid,packet,2);
 		}
 		hid=init_termo(hid);
 	}
-printf("Hum. : %.1f\n",get_hum(packet[1]));
+printf("Hum. : %.1f\n",get_hum((unsigned)packet[1]));
 ret = read_device(hid,packet,3);
 if (ret != HID_RET_SUCCESS) {
                 fprintf(stderr,"read_device failed with return code %d\n",ret);
@@ -72,8 +71,7 @@ if (ret != HID_RET_SUCCESS) {
                 hid=init_termo(hid);
         }
 ret = restore_termo(hid);
-ptemperatura=pack((unsigned)packet[2],(unsigned)packet[1]);
-printf("Temp.: %.1f\n",get_temp(ptemperatura));
+printf("Temp.: %.1f\n",get_temp(pack((unsigned)packet[2],(unsigned)packet[1])));
 return 0;
 }
 
