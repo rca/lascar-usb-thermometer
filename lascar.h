@@ -27,14 +27,16 @@ hid_return restore_termo(HIDInterface*);
 /**
  * Retrieve the temperature and humidity
  */
-hid_return get_reading(HIDInterface*, char*, float*, float*);
+hid_return get_reading(HIDInterface*, char*, float*, float*, int);
 
 /* the following functions are useful if only temp or humidity is desired */
 
 /**
- * Return the temperature in Celcius
+ * Return the temperature
+ *
+ * The second parameter can be 0 for Celcius or 1 for Farenheit
  */
-float get_temp(unsigned int);
+float get_temp(unsigned int, int);
 
 /**
  * Return the humidity as a percentage

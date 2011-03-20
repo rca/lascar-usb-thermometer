@@ -41,6 +41,8 @@ int main()
     int status = 0;
     int error_count = 0;
 
+    int get_f = 1;
+
     if((hid=init_termo(hid)) == NULL) {
         fprintf(stderr, "Device NOT present.\n");
         exit(-1);
@@ -48,7 +50,9 @@ int main()
 
     while(1) {
         status = 0;
-        if((ret=get_reading(hid, packet, &temp, &hum)) != HID_RET_SUCCESS) {
+
+        ret = get_reading(hid, packet, &temp, &hum, get_f);
+        if(ret != HID_RET_SUCCESS) {
             status = -1;
         }
 

@@ -1,10 +1,14 @@
 #include "lascar.h"
 
-float get_temp(unsigned int t) {
+float get_temp(unsigned int t, int get_f) {
     float rt = -200.0;
 
     for(; t>0; t--) {
         rt += STEPT;
+    }
+
+    if(get_f) {
+      rt = (rt * (9.0/5.0)) + 32;
     }
 
     return rt;
@@ -21,7 +25,7 @@ float get_hum(unsigned char h) {
 }
 
 hid_return
-get_reading(HIDInterface* hid, char* packet, float* temp, float* hum) {
+get_reading(HIDInterface* hid, char* packet, float* temp, float* hum, int get_f) {
     hid_return ret;
 
     if((ret=read_device(hid, packet, HUMIDITY)) != HID_RET_SUCCESS) {
@@ -36,7 +40,7 @@ get_reading(HIDInterface* hid, char* packet, float* temp, float* hum) {
         return ret;
     }
 
-    *temp = get_temp(pack((unsigned)packet[2], (unsigned)packet[1]));
+    *temp = get_temp(pack((unsigned)packet[2], (unsigned)packet[1]), get_f);
 
     return ret;
 }
