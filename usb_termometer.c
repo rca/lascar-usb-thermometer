@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
+#include <argp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -30,7 +31,56 @@
 #define MAX_ERRORS 10
 #define SLEEP_TIME 1.0
 
-int main()
+/**
+ * using argp to parse arguments
+ * http://www.gnu.org/s/libc/manual/html_node/Argp-Example-3.htlm
+ */
+/* Program documentation. */
+static char doc[] =
+  "Collect temperature and humidity readings";
+
+/* A description of the arguments we accept. */
+static char args_doc[] = "";
+
+struct arguments {
+  int count, debug, farenheit;
+};
+
+/* parse a single option. */
+static error_t
+parse_opt (int key, char *arg, struct argp_state *state)
+{
+  /* Get the input argument from argp_parse, which we
+     know is a pointer to our arguments structure. */
+  struct arguments *arguments = state->input;
+
+  switch (key) {
+  case 'c':
+    arguments->count = atoi(arg);
+    break;
+  case 'd':
+    arguments->debug = 1;
+    break;
+  case 'f':
+    arguments->farenheit = 1;
+    break;
+  default:
+    return ARGP_ERR_UNKNOWN;
+  }
+
+  return 0;
+}
+
+static struct argp_option options[] = {
+  {"count", 'c', "count", 0, "The number of readings to take"},
+  {"debug", 'd', 0, 0, "Enable debugging" },
+  {"farenheit", 'f', 0, 0, "Get temperature in farenheit; default celcius" },
+  { 0 }
+};
+
+static struct argp argp = { options, parse_opt, args_doc, doc };
+
+int main(int argc, char *argv[])
 {
     char packet[] = {0x00, 0x00, 0x00};
     HIDInterface* hid = NULL;
@@ -42,7 +92,26 @@ int main()
     int status = 0;
     int error_count = 0;
 
-    int get_f = 1;
+    int *arg_index = NULL;
+
+    int count = 0;
+
+    struct arguments arguments;
+
+    /* default argument values. */
+    arguments.count = 0; /* infinite */
+    arguments.debug = 0;
+    arguments.farenheit = 0;
+
+    if(argp_parse(&argp, argc, argv, 0, 0, &arguments) != 0) {
+      exit(-1);
+    }
+
+    /* setup debugging to stderr if requested */
+    if(arguments.debug) {
+        hid_set_debug(HID_DEBUG_ALL);
+        hid_set_debug_stream(stderr);
+    }
 
     if((hid=init_termo(hid)) == NULL) {
         fprintf(stderr, "Device NOT present.\n");
@@ -52,7 +121,7 @@ int main()
     while(1) {
         status = 0;
 
-        ret = get_reading(hid, packet, &temp, &hum, get_f);
+        ret = get_reading(hid, packet, &temp, &hum, arguments.farenheit);
         if(ret != HID_RET_SUCCESS) {
             status = -1;
         }
@@ -74,10 +143,14 @@ int main()
             error_count += 1;
         }
 
-        sleep(SLEEP_TIME);
+        if(arguments.count && ++count >= arguments.count) {
+            break;
+        } else {
+            sleep(SLEEP_TIME);
+        }
     }
 
-    ret = restore_termo(hid);
+    restore_termo(hid);
 
     return 0;
 }
