@@ -37,6 +37,7 @@ int main()
     hid_return ret;
 
     float temp, hum;
+    float last_temp, last_hum;
 
     int status = 0;
     int error_count = 0;
@@ -57,7 +58,12 @@ int main()
         }
 
         if(status == 0) {
-            printf("temp: %.1f, hum: %.1f\n", temp, hum);
+            if(temp != last_temp || hum != last_hum) {
+                printf("temp: %.1f, hum: %.1f\n", temp, hum);
+
+                last_temp = temp;
+                last_hum = hum;
+            }
 
             /* reset the error count on successful read */
             error_count = 0;
