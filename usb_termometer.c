@@ -27,43 +27,47 @@
 /* lascar API */
 #include "lascar.h"
 
+#define MAX_ERRORS 10
+#define SLEEP_TIME 1.0
 
+int main()
+{
+    char packet[] = {0x00, 0x00, 0x00};
+    HIDInterface* hid = NULL;
+    hid_return ret;
 
+    float temp, hum;
 
-if((hid=init_termo(hid))==NULL){
-	fprintf(stderr,"Device NOT present.\n");
-	exit (-1);
-}
+    int status = 0;
+    int error_count = 0;
 
-ret = read_device(hid,packet,2);
-	if (ret != HID_RET_SUCCESS) {
-		fprintf(stderr,"read_device failed with return code %d\n",ret);
-		ret = restore_termo(hid);
-		if (ret != HID_RET_SUCCESS) {
-			fprintf(stderr,"restore_termo failed with return code %d\n",ret);
-			exit(-1);
-		}
-		hid=init_termo(hid);
-	}
-printf("Hum. : %.1f\n",get_hum((unsigned)packet[1]));
-ret = read_device(hid,packet,3);
-if (ret != HID_RET_SUCCESS) {
-                fprintf(stderr,"read_device failed with return code %d\n",ret);
-                ret = restore_termo(hid);
-                if (ret != HID_RET_SUCCESS) {
-                        fprintf(stderr,"restore_termo failed with return code %d\n",ret);
-                        exit(-1);
-                }
-                hid=init_termo(hid);
+    if((hid=init_termo(hid)) == NULL) {
+        fprintf(stderr, "Device NOT present.\n");
+        exit(-1);
+    }
+
+    while(1) {
+        status = 0;
+        if((ret=get_reading(hid, packet, &temp, &hum)) != HID_RET_SUCCESS) {
+            status = -1;
         }
-ret = restore_termo(hid);
-printf("Temp.: %.1f\n",get_temp(pack((unsigned)packet[2],(unsigned)packet[1])));
-return 0;
-}
 
+        if(status == 0) {
+            printf("temp: %.1f, hum: %.1f\n", temp, hum);
 
-}
+            /* reset the error count on successful read */
+            error_count = 0;
+        } else if(error_count > MAX_ERRORS) {
+            fprintf(stderr, "Too many errors to continue\n");
+            exit(-1);
+        } else {
+            error_count += 1;
+        }
 
+        sleep(SLEEP_TIME);
+    }
 
+    ret = restore_termo(hid);
 
+    return 0;
 }
