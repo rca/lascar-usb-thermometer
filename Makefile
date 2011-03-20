@@ -7,9 +7,19 @@ CFLAGS	+= -g $(shell pkg-config --cflags libhid)
 LDFLAGS	+= -g
 LIBS 	+= $(shell pkg-config --libs libhid)
 
-ALL: $(PROGRAM_FILES)
-	$(CC) $(PROGRAM_FILES) $(CFLAGS) $(LDFLAGS) -o $(PROGRAM) $(LIBS)
+SOURCES = $(wildcard *.c)
 
-clean:
+OBJS = $(SOURCES:.c=.o)
+
+ALL: $(PROGRAM)
+
+$(PROGRAM): $(OBJS)
+	$(CC) $(OBJS) $(CFLAGS) $(LDFLAGS) -o $(PROGRAM) $(LIBS)
+
+%.o: %.c
+	$(CC) -c $(CFLAGS) $< -o $@
+
+.PHONY clean:
 	@rm -rf $(PROGRAM)
+	@rm -rf $(OBJS)
 
