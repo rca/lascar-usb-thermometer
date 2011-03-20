@@ -14,33 +14,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/> 
     									**/
 
-#include <hid.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
-#define EP_HID_IN             0x81
-#define espera		      520
-#define STEPT 0.1
-#define STEPH 0.5
-#define dev_id { 0x1781, 0x0ec4, NULL, NULL, 0 }
 
-/* functions */
-HIDInterface* init_termo(HIDInterface*);
-hid_return restore_termo(HIDInterface*);
-hid_return read_device(HIDInterface*,char*,int);
-void print_packet(char*,int);
-unsigned int pack(unsigned char, unsigned char);
-float get_temp(unsigned int);
-float get_hum(unsigned char);
-/* functions */
+/* human interface device API */
+#include <hid.h>
 
-int main(){
-/* vars */
+/* lascar API */
+#include "lascar.h"
 
-char packet[]={0x00,0x00,0x00};
-HIDInterface* hid=NULL;
-hid_return ret;
 
 
 
@@ -75,63 +59,9 @@ printf("Temp.: %.1f\n",get_temp(pack((unsigned)packet[2],(unsigned)packet[1])));
 return 0;
 }
 
-float get_temp(unsigned int t){
-	float rt=-200.0;
-	for (;t>0;t--){
-		rt+=STEPT;
-	}
-	return rt;
-}
-float get_hum(unsigned char h){
-	float rh=0;
-	for (;h>0x00;h--){
-		rh+=STEPH;
-	}
-	return rh;
-}
-HIDInterface* init_termo(HIDInterface* hid){
- 	HIDInterfaceMatcher matcher =  dev_id;
-	hid_return	i;
-	i = hid_init();
-	if (i != HID_RET_SUCCESS) {
-		hid = NULL;
-   	}
-	hid = hid_new_HIDInterface();
-	i = hid_force_open(hid, 0, &matcher, 3);
-	if (i != HID_RET_SUCCESS) {
-  		hid = NULL;
-	}
-	return hid;
-}
-hid_return restore_termo(HIDInterface* hid){
-	hid_return	i;
-	i = hid_close(hid);
-	if (i != HID_RET_SUCCESS) {
-   		 fprintf(stderr, "hid_close failed with return code %d\n", i);
-   	}
-	hid_delete_HIDInterface(&hid);
-	i = hid_cleanup();	
-	if (i != HID_RET_SUCCESS) {
-   		 fprintf(stderr, "hid_cleanup failed with return code %d\n",i);
-	}
-	return i;
 
 }
 
-hid_return read_device(HIDInterface* hid, char* buf,int size){
-	hid_return i;
-	i = hid_interrupt_read(hid, EP_HID_IN, buf, size, espera);
 
-	if (i != HID_RET_SUCCESS) {
-     		fprintf(stderr, "hid_get_input_report failed with return code %d\n", i);
-	}
-	return i;	
-}
 
-unsigned int pack(unsigned char a, unsigned char b){
-        unsigned int packed;
-        packed = a;
-        packed <<= 8;
-        packed |= b;
-        return packed;
 }
