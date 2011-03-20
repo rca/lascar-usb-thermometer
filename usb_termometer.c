@@ -72,7 +72,8 @@ parse_opt (int key, char *arg, struct argp_state *state)
 }
 
 static struct argp_option options[] = {
-  {"count", 'c', "count", 0, "The number of readings to take"},
+  {"count", 'c', "count", 0,
+   "The number of readings to take; default 1, if 0 go forever"},
   {"debug", 'd', 0, 0, "Enable debugging" },
   {"farenheit", 'f', 0, 0, "Get temperature in farenheit; default celcius" },
   { 0 }
@@ -99,7 +100,7 @@ int main(int argc, char *argv[])
     struct arguments arguments;
 
     /* default argument values. */
-    arguments.count = 0; /* infinite */
+    arguments.count = 1; /* infinite */
     arguments.debug = 0;
     arguments.farenheit = 0;
 
@@ -132,6 +133,7 @@ int main(int argc, char *argv[])
 
                 last_temp = temp;
                 last_hum = hum;
+                count ++;
             }
 
             /* reset the error count on successful read */
@@ -143,7 +145,7 @@ int main(int argc, char *argv[])
             error_count += 1;
         }
 
-        if(arguments.count && ++count >= arguments.count) {
+        if(arguments.count && count >= arguments.count) {
             break;
         } else {
             sleep(SLEEP_TIME);
