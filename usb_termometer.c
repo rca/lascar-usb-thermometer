@@ -55,7 +55,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
   struct arguments *arguments = state->input;
 
   switch (key) {
-  case 'c':
+  case 'n':
     arguments->count = atoi(arg);
     break;
   case 'd':
@@ -72,7 +72,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
 }
 
 static struct argp_option options[] = {
-  {"count", 'c', "count", 0,
+  {"num", 'n', "num", 0,
    "The number of readings to take; default 1, if 0 go forever"},
   {"debug", 'd', 0, 0, "Enable debugging" },
   {"farenheit", 'f', 0, 0, "Get temperature in farenheit; default celcius" },
