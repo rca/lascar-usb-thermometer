@@ -66,7 +66,17 @@ get_reading_r(HIDInterface* hid, char* packet,
 
     *hum = get_hum((unsigned)packet[1]);
 
-    return ret;
+    /* check to make sure the values found are within spec, otherwise retry */
+    if(*temp >= -200.0 && *temp <= 200.0 && *hum >= 0.0 && *hum <= 100.0) {
+        return ret;
+    } else if(retries) {
+        /* if the values were bad, try another two times before giving up */
+        /*fprintf(stderr,
+                  "Bad values for temp (%.1f) and hum (%.1f)\n", temp, hum);*/
+        return get_reading_r(hid, packet, temp, hum, get_f, 2);
+    } else {
+        return HID_RET_NOT_FOUND;
+    }
 }
 
 HIDInterface* init_termo(HIDInterface* hid) {
