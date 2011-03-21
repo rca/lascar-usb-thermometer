@@ -122,8 +122,7 @@ int main(int argc, char *argv[])
     while(1) {
         status = 0;
 
-        ret = get_reading(hid, packet, &temp, &hum, arguments.farenheit,
-                          GET_READING_RETRY);
+        ret = get_reading(hid, packet, &temp, &hum, arguments.farenheit);
         if(ret != HID_RET_SUCCESS) {
             status = -1;
         }

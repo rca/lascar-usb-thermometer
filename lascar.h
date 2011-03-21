@@ -28,12 +28,11 @@ HIDInterface* init_termo(HIDInterface*);
 hid_return restore_termo(HIDInterface*);
 
 /*
- * The retry parameter can be used to tell get_reading() to
- * automatically retry on error.
+ * Retrieve temperature and humidity readings from the device
  */
 hid_return
 get_reading(HIDInterface* hid,
-            char* packet, float* temp, float* hum, int get_f, int retry);
+            char* packet, float* temp, float* hum, int get_f);
 
 /* the following functions are useful if only temp or humidity is desired */
 
@@ -50,6 +49,14 @@ float get_temp(unsigned int, int);
 float get_hum(unsigned char);
 
 /* the following functions are used internally and should not be needed */
+
+/*
+ * The retry parameter can be used to tell get_reading() to
+ * automatically retry on error.
+ */
+hid_return
+get_reading_r(HIDInterface* hid,
+              char* packet, float* temp, float* hum, int get_f, int retry);
 
 /**
  * Read the specified number of bytes from the device

@@ -26,7 +26,13 @@ float get_hum(unsigned char h) {
 
 hid_return
 get_reading(HIDInterface* hid, char* packet,
-            float* temp, float* hum, int get_f, int retry) {
+              float* temp, float* hum, int get_f) {
+    return get_reading_r(hid, packet, temp, hum, get_f, GET_READING_RETRY);
+}
+
+hid_return
+get_reading_r(HIDInterface* hid, char* packet,
+              float* temp, float* hum, int get_f, int retry) {
     hid_return ret;
 
     /*
@@ -44,8 +50,8 @@ get_reading(HIDInterface* hid, char* packet,
     if((ret=read_device(hid, packet, TEMPERATURE)) != HID_RET_SUCCESS) {
         if(ret == 21 && retry) {
             /*fprintf(stderr, "Retrying on error 21\n");*/
-            return get_reading(hid, packet, temp, hum, get_f,
-                               GET_READING_NO_RETRY);
+            return get_reading_r(hid, packet, temp, hum, get_f,
+                                 GET_READING_NO_RETRY);
         } else {
             fprintf(stderr, "Unable to read temperature (%d)\n", TEMPERATURE);
             return ret;
