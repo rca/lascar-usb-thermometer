@@ -9,14 +9,6 @@ This program uses `libhid`_ to communicate with the device.  It can
 be downloaded from the `Alioth Debian website`_.
 
 
-Known Bugs
-==========
-
-Sometimes ``temp`` or ``hum`` values don't make sense.  The reason is
-unknown, and the solution may be to send control commands to usb
-device via `hid_get_input_report()`_, which is under investigation.
-
-
 Installing
 ==========
 
