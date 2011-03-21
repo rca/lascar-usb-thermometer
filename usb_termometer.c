@@ -122,7 +122,8 @@ int main(int argc, char *argv[])
     while(1) {
         status = 0;
 
-        ret = get_reading(hid, packet, &temp, &hum, arguments.farenheit);
+        ret = get_reading(hid, packet, &temp, &hum, arguments.farenheit,
+                          GET_READING_RETRY);
         if(ret != HID_RET_SUCCESS) {
             status = -1;
         }
@@ -134,7 +135,7 @@ int main(int argc, char *argv[])
                 last_temp = temp;
                 last_hum = hum;
                 count ++;
-            }
+              }
 
             /* reset the error count on successful read */
             error_count = 0;
@@ -142,7 +143,7 @@ int main(int argc, char *argv[])
             fprintf(stderr, "Too many errors to continue\n");
             exit(-1);
         } else {
-            error_count += 1;
+            error_count++;
         }
 
         if(arguments.count && count >= arguments.count) {

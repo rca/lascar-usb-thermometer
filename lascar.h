@@ -12,6 +12,9 @@
 #define HUMIDITY 2
 #define TEMPERATURE 3
 
+#define GET_READING_NO_RETRY 0
+#define GET_READING_RETRY 1
+
 /* it's likely the following three functions are the most useful */
 
 /**
@@ -24,10 +27,13 @@ HIDInterface* init_termo(HIDInterface*);
  */
 hid_return restore_termo(HIDInterface*);
 
-/**
- * Retrieve the temperature and humidity
+/*
+ * The retry parameter can be used to tell get_reading() to
+ * automatically retry on error.
  */
-hid_return get_reading(HIDInterface*, char*, float*, float*, int);
+hid_return
+get_reading(HIDInterface* hid,
+            char* packet, float* temp, float* hum, int get_f, int retry);
 
 /* the following functions are useful if only temp or humidity is desired */
 

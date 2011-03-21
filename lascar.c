@@ -25,8 +25,34 @@ float get_hum(unsigned char h) {
 }
 
 hid_return
-get_reading(HIDInterface* hid, char* packet, float* temp, float* hum, int get_f) {
+get_reading(HIDInterface* hid, char* packet,
+            float* temp, float* hum, int get_f, int retry) {
     hid_return ret;
+
+    /*
+     * The temperature and humidity values are always sent one after the other,
+     * i.e. there is no way to request the same value back to back; you're
+     * going to get temp, hum, temp, hum, [...].  We know simply know if the
+     * data retrieved has 3 bytes it's temperature and if it has two bytes it's
+     * humidity.
+     *
+     * If we grab the temperature first and it fails, we can assume the device
+     * sent us humidity, so throw it out and re-request the data.  If for some
+     * reason the subsequent request fails, then there is a problem and return
+     * an error.
+     */
+    if((ret=read_device(hid, packet, TEMPERATURE)) != HID_RET_SUCCESS) {
+        if(ret == 21 && retry) {
+            /*fprintf(stderr, "Retrying on error 21\n");*/
+            return get_reading(hid, packet, temp, hum, get_f,
+                               GET_READING_NO_RETRY);
+        } else {
+            fprintf(stderr, "Unable to read temperature (%d)\n", TEMPERATURE);
+            return ret;
+        }
+    }
+
+    *temp = get_temp(pack((unsigned)packet[2], (unsigned)packet[1]), get_f);
 
     if((ret=read_device(hid, packet, HUMIDITY)) != HID_RET_SUCCESS) {
         fprintf(stderr, "Unable to read humidity (%d)\n", HUMIDITY);
@@ -34,13 +60,6 @@ get_reading(HIDInterface* hid, char* packet, float* temp, float* hum, int get_f)
     }
 
     *hum = get_hum((unsigned)packet[1]);
-
-    if((ret=read_device(hid, packet, TEMPERATURE)) != HID_RET_SUCCESS) {
-        fprintf(stderr, "Unable to read temperature (%d)\n", TEMPERATURE);
-        return ret;
-    }
-
-    *temp = get_temp(pack((unsigned)packet[2], (unsigned)packet[1]), get_f);
 
     return ret;
 }
@@ -88,6 +107,7 @@ hid_return read_device(HIDInterface* hid, char* buf, int size) {
     hid_return i;
 
     i = hid_interrupt_read(hid, EP_HID_IN, buf, size, espera);
+
     if(i != HID_RET_SUCCESS) {
         fprintf(stderr, "hid_get_input_report failed with return code %d\n", i);
     }
