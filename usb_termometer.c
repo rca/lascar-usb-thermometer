@@ -130,6 +130,7 @@ int main(int argc, char *argv[])
         if(status == 0) {
             if(temp != last_temp || hum != last_hum) {
                 printf("temp: %.1f, hum: %.1f\n", temp, hum);
+                fflush(stdout);
 
                 last_temp = temp;
                 last_hum = hum;
